@@ -36,6 +36,9 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Link matterbridge into project
+        run: npm link matterbridge --no-fund --no-audit
+
       - name: Lint
         run: npm run lint
 
