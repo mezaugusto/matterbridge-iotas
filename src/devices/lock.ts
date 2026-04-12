@@ -1,7 +1,7 @@
 import { doorLockDevice } from 'matterbridge';
 import { DoorLock, PowerSource } from 'matterbridge/matter/clusters';
 
-import { FeatureCategory, findFeatureByCategory, type Device } from 'iotas-ts';
+import { FeatureCategory, findFeatureByCategory, LOW_BATTERY_THRESHOLD, type Device } from 'iotas-ts';
 
 import type { DeviceFactoryContext, EndpointResult } from './types.js';
 import { bridgedNode, createBridgedEndpoint, multiFeatureResult, requireFeature } from './helpers.js';
@@ -49,7 +49,7 @@ export function createDoorLock(device: Device, ctx: DeviceFactoryContext): Endpo
     const matterPercent = batteryPercent * 2; // Matter uses 0-200 (0.5% steps)
     endpoint.createDefaultPowerSourceReplaceableBatteryClusterServer(
       matterPercent,
-      batteryPercent < 20 ? PowerSource.BatChargeLevel.Critical : PowerSource.BatChargeLevel.Ok,
+      batteryPercent < LOW_BATTERY_THRESHOLD ? PowerSource.BatChargeLevel.Critical : PowerSource.BatChargeLevel.Ok,
       batteryPercent * 30,
       'CR123A',
       1,
@@ -61,7 +61,7 @@ export function createDoorLock(device: Device, ctx: DeviceFactoryContext): Endpo
       endpoint.setAttribute(
         PowerSource.Cluster.id,
         'batChargeLevel',
-        percent < 20 ? PowerSource.BatChargeLevel.Critical : PowerSource.BatChargeLevel.Ok,
+        percent < LOW_BATTERY_THRESHOLD ? PowerSource.BatChargeLevel.Critical : PowerSource.BatChargeLevel.Ok,
       );
     });
   }

@@ -1,7 +1,15 @@
 import { thermostatDevice } from 'matterbridge';
 import { Thermostat } from 'matterbridge/matter/clusters';
 
-import { FeatureCategory, ThermostatMode, findFeatureByCategory, type Device } from 'iotas-ts';
+import {
+  FeatureCategory,
+  ThermostatMode,
+  findFeatureByCategory,
+  DEFAULT_CURRENT_TEMPERATURE_F,
+  DEFAULT_HEAT_SETPOINT_F,
+  DEFAULT_COOL_SETPOINT_F,
+  type Device,
+} from 'iotas-ts';
 
 import type { DeviceFactoryContext, EndpointResult } from './types.js';
 import {
@@ -59,9 +67,9 @@ export function createThermostat(device: Device, ctx: DeviceFactoryContext): End
     return null;
   }
 
-  const currentTempC = toCelsius(tempFeature.value ?? 70);
-  const heatSetpointC = toCelsius(heatSetpointFeature?.value ?? 68);
-  const coolSetpointC = toCelsius(coolSetpointFeature?.value ?? 76);
+  const currentTempC = toCelsius(tempFeature.value ?? DEFAULT_CURRENT_TEMPERATURE_F);
+  const heatSetpointC = toCelsius(heatSetpointFeature?.value ?? DEFAULT_HEAT_SETPOINT_F);
+  const coolSetpointC = toCelsius(coolSetpointFeature?.value ?? DEFAULT_COOL_SETPOINT_F);
 
   const endpoint = createBridgedEndpoint([thermostatDevice, bridgedNode], device, ctx)
     .createDefaultThermostatClusterServer(currentTempC, heatSetpointC, coolSetpointC)
