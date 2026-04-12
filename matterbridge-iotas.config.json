@@ -1,0 +1,12 @@
+{
+  "name": "matterbridge-iotas",
+  "type": "DynamicPlatform",
+  "username": "",
+  "password": "",
+  "unit": "",
+  "whiteList": [],
+  "blackList": [],
+  "pollingInterval": 5,
+  "debug": false,
+  "unregisterOnShutdown": false
+}
