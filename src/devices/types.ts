@@ -13,7 +13,7 @@ export const VENDOR_ID = 0xfff1;
 export interface DeviceFactoryContext {
   log: AnsiLogger;
   debug: boolean;
-  onFeatureUpdate: (featureId: number, value: number) => Promise<void>;
+  onFeatureUpdate: (featureId: number, value: number) => void;
 }
 
 /**
