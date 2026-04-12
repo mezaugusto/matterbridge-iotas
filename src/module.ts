@@ -1,10 +1,3 @@
-/**
- * Matterbridge IOTAS Plugin
- *
- * Entry point for the Matterbridge dynamic platform plugin.
- * Bridges IOTAS smart home devices to Matter via Matterbridge.
- */
-
 import { MatterbridgeDynamicPlatform, MatterbridgeEndpoint, PlatformConfig, PlatformMatterbridge } from 'matterbridge';
 import { AnsiLogger } from 'matterbridge/logger';
 import { FeatureCache, IotasClient, filterDevices } from 'iotas-ts';
@@ -60,10 +53,6 @@ export class IotasPlatform extends MatterbridgeDynamicPlatform {
     this.log.info('IOTAS platform initialized');
   }
 
-  /**
-   * Build a SnapshotFilter from the Matterbridge whiteList/blackList config.
-   * Returns undefined if neither list is configured.
-   */
   createSnapshotFilter(): SnapshotFilter | undefined {
     const whiteList = this.config.whiteList as string[] | undefined;
     const blackList = this.config.blackList as string[] | undefined;
@@ -101,7 +90,6 @@ export class IotasPlatform extends MatterbridgeDynamicPlatform {
     await super.onConfigure();
     this.log.info('Configuring IOTAS platform');
 
-    // Refresh device states from a fresh API snapshot
     try {
       const rooms = await this.iotasClient.getRooms();
       this.refreshStates(rooms);
@@ -121,16 +109,12 @@ export class IotasPlatform extends MatterbridgeDynamicPlatform {
     }
   }
 
-  /**
-   * Discover and register devices from IOTAS rooms snapshot.
-   */
   private async discoverDevices(rooms: Rooms): Promise<void> {
     const ctx: DeviceFactoryContext = {
       log: this.log,
       debug: this.config.debug ?? false,
       onFeatureUpdate: (featureId: number, value: number) => {
-        this.iotasClient.updateFeature(featureId.toString(), value);
-        this.featureCache.set(featureId.toString(), value);
+        this.featureCache.writeThrough(featureId.toString(), value);
       },
     };
 
@@ -161,9 +145,6 @@ export class IotasPlatform extends MatterbridgeDynamicPlatform {
     }
   }
 
-  /**
-   * Push fresh feature values into all registered endpoints.
-   */
   private refreshStates(rooms: Rooms): void {
     for (const room of rooms) {
       for (const device of room.devices) {

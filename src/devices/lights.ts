@@ -1,7 +1,7 @@
 import { dimmableLight, onOffLight } from 'matterbridge';
 import { LevelControl, OnOff } from 'matterbridge/matter/clusters';
 
-import type { Device } from 'iotas-ts';
+import { EventTypeName, findFeatureByEventType, type Device } from 'iotas-ts';
 
 import type { DeviceFactoryContext, EndpointResult } from './types.js';
 import {
@@ -9,13 +9,11 @@ import {
   bridgedNode,
   createBridgedEndpoint,
   createSimpleOnOffDevice,
-  findFeatureByEventType,
   fromMatterLevel,
   multiFeatureResult,
   singleFeatureResult,
   toMatterLevel,
 } from './helpers.js';
-import { EventType } from '../constants.js';
 
 function createStandardDimmableLight(
   device: Device,
@@ -92,8 +90,8 @@ function createLevelOnlyDimmableLight(
 }
 
 export function createDimmableLight(device: Device, ctx: DeviceFactoryContext): EndpointResult | null {
-  const onOffFeature = findFeatureByEventType(device, EventType.OnOff);
-  const levelFeature = findFeatureByEventType(device, EventType.Level);
+  const onOffFeature = findFeatureByEventType(device, EventTypeName.OnOff);
+  const levelFeature = findFeatureByEventType(device, EventTypeName.Level);
 
   if (!levelFeature) {
     ctx.log.warn(`Device ${device.name} missing Level feature for dimmable light`);

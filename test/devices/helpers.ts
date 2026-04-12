@@ -7,7 +7,7 @@ import assert from 'node:assert/strict';
 import { AnsiLogger, LogLevel } from 'matterbridge/logger';
 import type { Device, Feature } from 'iotas-ts';
 
-import type { DeviceFactoryContext, EndpointResult } from '../../src/deviceFactory.js';
+import type { DeviceFactoryContext, EndpointResult } from '../../src/devices/types.js';
 
 export function makeLog(): AnsiLogger {
   return new AnsiLogger({ logName: 'test', logLevel: LogLevel.NONE });

@@ -2,32 +2,16 @@
  * Device Factory - Router that maps IOTAS device categories to factory functions.
  *
  * Individual device factories live in src/devices/.
- * This module provides createEndpointForDevice (the router) and re-exports everything.
+ * This module provides createEndpointForDevice (the router).
  */
 
-import type { Device } from 'iotas-ts';
-
-import { DeviceCategory, EventType, FeatureType, isDeviceCategory, type FeatureCategory } from './constants.js';
+import { DeviceCategory, EventTypeName, FeatureCategory, isDeviceCategory, type Device } from 'iotas-ts';
 import type { DeviceFactoryContext, EndpointResult } from './devices/types.js';
 import { createDimmableLight, createOnOffLight } from './devices/lights.js';
 import { createOnOffOutlet } from './devices/outlet.js';
 import { createDoorLock } from './devices/lock.js';
 import { createThermostat } from './devices/thermostat.js';
 import { createHumiditySensor, createOccupancySensor, createContactSensor } from './devices/sensors.js';
-
-// Re-export everything from devices/ so consumers can import from deviceFactory
-export type { DeviceFactoryContext, EndpointResult } from './devices/index.js';
-
-export {
-  createDimmableLight,
-  createOnOffLight,
-  createOnOffOutlet,
-  createDoorLock,
-  createThermostat,
-  createHumiditySensor,
-  createOccupancySensor,
-  createContactSensor,
-};
 
 // ---------------------------------------------------------------------------
 // Router
@@ -41,7 +25,7 @@ function handleSwitch(device: Device, ctx: DeviceFactoryContext): EndpointResult
 }
 
 function handleDimmer(device: Device, ctx: DeviceFactoryContext): EndpointResult | null {
-  const hasLevel = device.features.some((f) => f.eventTypeName === EventType.Level);
+  const hasLevel = device.features.some((f) => f.eventTypeName === EventTypeName.Level);
   if (hasLevel) {
     return createDimmableLight(device, ctx);
   }
@@ -65,8 +49,8 @@ const categoryHandlers = new Map<DeviceCategory, DeviceHandler>([
  * 2) motion
  */
 const featureFallbacks: Array<{ category: FeatureCategory; handler: DeviceHandler }> = [
-  { category: FeatureType.Humidity, handler: createHumiditySensor },
-  { category: FeatureType.Motion, handler: createOccupancySensor },
+  { category: FeatureCategory.Humidity, handler: createHumiditySensor },
+  { category: FeatureCategory.Motion, handler: createOccupancySensor },
 ];
 
 /**

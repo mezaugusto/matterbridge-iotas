@@ -1,69 +1,64 @@
 import { thermostatDevice } from 'matterbridge';
 import { Thermostat } from 'matterbridge/matter/clusters';
 
-import type { Device } from 'iotas-ts';
+import { FeatureCategory, ThermostatMode, findFeatureByCategory, type Device } from 'iotas-ts';
 
 import type { DeviceFactoryContext, EndpointResult } from './types.js';
 import {
   bridgedNode,
   createBridgedEndpoint,
-  findFeature,
   fromMatterCentiCelsius,
   multiFeatureResult,
   requireFeature,
   toCelsius,
   toMatterCentiCelsius,
 } from './helpers.js';
-import { FeatureType } from '../constants.js';
 
 /**
  * Map IOTAS thermostat mode values to Matter SystemMode.
- * IOTAS modes: 0=Off, 1=Heat, 2=Cool, 3=Emergency Heat, 4=Auto
+ * ThermostatMode enum values match IOTAS indices: 0=Off, 1=Heat, 2=Cool, 3=EmergencyHeat, 4=Auto
  */
 export function iotasModeToSystemMode(iotasMode: number): Thermostat.SystemMode {
-  switch (iotasMode) {
-    case 1:
+  const mode = iotasMode as ThermostatMode;
+  switch (mode) {
+    case ThermostatMode.Heat:
       return Thermostat.SystemMode.Heat;
-    case 2:
+    case ThermostatMode.Cool:
       return Thermostat.SystemMode.Cool;
-    case 3:
+    case ThermostatMode.EmergencyHeat:
       return Thermostat.SystemMode.EmergencyHeat;
-    case 4:
+    case ThermostatMode.Auto:
       return Thermostat.SystemMode.Auto;
     default:
       return Thermostat.SystemMode.Off;
   }
 }
 
-/**
- * Map Matter SystemMode to IOTAS thermostat mode value.
- */
-function systemModeToIotasMode(systemMode: Thermostat.SystemMode): number {
+function systemModeToIotasMode(systemMode: Thermostat.SystemMode): ThermostatMode {
   switch (systemMode) {
     case Thermostat.SystemMode.Heat:
-      return 1;
+      return ThermostatMode.Heat;
     case Thermostat.SystemMode.Cool:
-      return 2;
+      return ThermostatMode.Cool;
     case Thermostat.SystemMode.EmergencyHeat:
-      return 3;
+      return ThermostatMode.EmergencyHeat;
     case Thermostat.SystemMode.Auto:
-      return 4;
+      return ThermostatMode.Auto;
     default:
-      return 0;
+      return ThermostatMode.Off;
   }
 }
 
 export function createThermostat(device: Device, ctx: DeviceFactoryContext): EndpointResult | null {
-  const tempFeature = requireFeature(device, FeatureType.CurrentTemperature, ctx, 'thermostat');
-  const modeFeature = findFeature(device, FeatureType.ThermostatMode);
-  const heatSetpointFeature = findFeature(device, FeatureType.HeatSetPoint);
-  const coolSetpointFeature = findFeature(device, FeatureType.CoolSetPoint);
+  const tempFeature = requireFeature(device, FeatureCategory.CurrentTemperature, ctx, 'thermostat');
+  const modeFeature = findFeatureByCategory(device, FeatureCategory.ThermostatMode);
+  const heatSetpointFeature = findFeatureByCategory(device, FeatureCategory.HeatSetPoint);
+  const coolSetpointFeature = findFeatureByCategory(device, FeatureCategory.CoolSetPoint);
 
   if (!tempFeature) {
     return null;
   }
 
-  // createDefaultThermostatClusterServer takes degrees Celsius (multiplies by 100 internally)
   const currentTempC = toCelsius(tempFeature.value ?? 70);
   const heatSetpointC = toCelsius(heatSetpointFeature?.value ?? 68);
   const coolSetpointC = toCelsius(coolSetpointFeature?.value ?? 76);
@@ -72,7 +67,6 @@ export function createThermostat(device: Device, ctx: DeviceFactoryContext): End
     .createDefaultThermostatClusterServer(currentTempC, heatSetpointC, coolSetpointC)
     .addRequiredClusterServers();
 
-  // Command handler: system mode changes from Matter controller
   if (modeFeature) {
     endpoint.subscribeAttribute(Thermostat.Cluster.id, 'systemMode', (newValue: Thermostat.SystemMode) => {
       const iotasMode = systemModeToIotasMode(newValue);
@@ -80,7 +74,6 @@ export function createThermostat(device: Device, ctx: DeviceFactoryContext): End
     });
   }
 
-  // Command handler: heating setpoint changes from Matter controller
   if (heatSetpointFeature) {
     endpoint.subscribeAttribute(Thermostat.Cluster.id, 'occupiedHeatingSetpoint', (newValue: number) => {
       const fahrenheit = fromMatterCentiCelsius(newValue);
@@ -88,7 +81,6 @@ export function createThermostat(device: Device, ctx: DeviceFactoryContext): End
     });
   }
 
-  // Command handler: cooling setpoint changes from Matter controller
   if (coolSetpointFeature) {
     endpoint.subscribeAttribute(Thermostat.Cluster.id, 'occupiedCoolingSetpoint', (newValue: number) => {
       const fahrenheit = fromMatterCentiCelsius(newValue);
