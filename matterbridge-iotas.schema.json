@@ -1,0 +1,59 @@
+{
+  "title": "IOTAS",
+  "description": "Matterbridge plugin for IOTAS smart home devices",
+  "type": "object",
+  "properties": {
+    "name": {
+      "type": "string",
+      "title": "Plugin Name",
+      "description": "Plugin name (auto-populated)",
+      "readOnly": true,
+      "ui:widget": "hidden"
+    },
+    "type": {
+      "type": "string",
+      "title": "Plugin Type",
+      "description": "Plugin type (auto-populated)",
+      "readOnly": true,
+      "ui:widget": "hidden"
+    },
+    "username": {
+      "type": "string",
+      "title": "IOTAS Email",
+      "description": "Your IOTAS account email address",
+      "format": "email"
+    },
+    "password": {
+      "type": "string",
+      "title": "IOTAS Password",
+      "description": "Your IOTAS account password",
+      "ui:widget": "password"
+    },
+    "unit": {
+      "type": "string",
+      "title": "Unit Name",
+      "description": "Optional: specify which unit to use if you have multiple units"
+    },
+    "pollingInterval": {
+      "type": "integer",
+      "title": "Polling Interval (seconds)",
+      "description": "How often to poll the IOTAS API for state changes",
+      "default": 5,
+      "minimum": 5,
+      "maximum": 300
+    },
+    "debug": {
+      "type": "boolean",
+      "title": "Enable Debug Logging",
+      "description": "Enable verbose debug output",
+      "default": false
+    },
+    "unregisterOnShutdown": {
+      "type": "boolean",
+      "title": "Unregister on Shutdown",
+      "description": "Unregister all devices when plugin shuts down (development only)",
+      "default": false
+    }
+  },
+  "required": ["username", "password"]
+}

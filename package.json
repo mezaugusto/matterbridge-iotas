@@ -1,0 +1,67 @@
+{
+  "name": "matterbridge-iotas",
+  "version": "0.1.0",
+  "description": "Matterbridge plugin for IOTAS smart home devices",
+  "author": "Augusto Meza <mezaugusto@proton.me>",
+  "license": "Apache-2.0",
+  "type": "module",
+  "main": "dist/src/module.js",
+  "types": "dist/src/module.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/src/module.js",
+      "types": "./dist/src/module.d.ts"
+    }
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mezaugusto/matterbridge-iotas.git"
+  },
+  "bugs": {
+    "url": "https://github.com/mezaugusto/matterbridge-iotas/issues"
+  },
+  "keywords": [
+    "matterbridge",
+    "matter",
+    "iotas",
+    "smart-home",
+    "matter.js",
+    "plugin"
+  ],
+  "engines": {
+    "node": "^20.18.0 || ^22.10.0 || ^24.0.0"
+  },
+  "files": [
+    "dist",
+    "*.config.json",
+    "*.schema.json",
+    "CHANGELOG.md"
+  ],
+  "scripts": {
+    "build": "rm -rf ./dist && tsc",
+    "lint": "eslint . --max-warnings=0",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "test": "tsc && node --test dist/test/*.test.js",
+    "prepublishOnly": "npm run lint && npm run build"
+  },
+  "prettier": {
+    "singleQuote": true,
+    "trailingComma": "all",
+    "tabWidth": 2,
+    "semi": true,
+    "printWidth": 120
+  },
+  "dependencies": {
+    "iotas-ts": "^0.1.0"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.0.0",
+    "@types/node": "^22.0.0",
+    "eslint": "^9.0.0",
+    "eslint-config-prettier": "^10.0.0",
+    "prettier": "^3.0.0",
+    "typescript": "^5.0.0",
+    "typescript-eslint": "^8.0.0"
+  }
+}
