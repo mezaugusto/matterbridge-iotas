@@ -6,6 +6,7 @@ import path from 'node:path';
 
 import { MatterbridgeDynamicPlatform, PlatformMatterbridge } from 'matterbridge';
 import { AnsiLogger, LogLevel } from 'matterbridge/logger';
+import { FeatureCache } from 'iotas-ts';
 
 import { IotasPlatform } from '../src/module.js';
 import type { IotasPluginConfig } from '../src/module.js';
@@ -72,6 +73,12 @@ describe('IotasPlatform', () => {
   it('should pass unit to client when configured', () => {
     const platform = new IotasPlatform(makeMatterbridge(storageDir), makeLog(), makeConfig({ unit: 'Apt 101' }));
     assert.ok(platform.iotasClient);
+  });
+
+  it('should create a FeatureCache on construction', () => {
+    const platform = new IotasPlatform(makeMatterbridge(storageDir), makeLog(), makeConfig());
+    assert.ok(platform.featureCache);
+    assert.ok(platform.featureCache instanceof FeatureCache);
   });
 
   describe('createSnapshotFilter', () => {
