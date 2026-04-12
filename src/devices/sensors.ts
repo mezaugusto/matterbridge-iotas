@@ -1,7 +1,7 @@
 import { contactSensor, humiditySensor, occupancySensor } from 'matterbridge';
 import { BooleanState, OccupancySensing, RelativeHumidityMeasurement } from 'matterbridge/matter/clusters';
 
-import type { Device } from 'iotas-ts';
+import { FeatureCategory, type Device } from 'iotas-ts';
 
 import type { DeviceFactoryContext, EndpointResult } from './types.js';
 import {
@@ -11,10 +11,9 @@ import {
   singleFeatureResult,
   toMatterHumidity,
 } from './helpers.js';
-import { FeatureType } from '../constants.js';
 
 export function createHumiditySensor(device: Device, ctx: DeviceFactoryContext): EndpointResult | null {
-  const humidityFeature = requireFeature(device, FeatureType.Humidity, ctx, 'humidity sensor');
+  const humidityFeature = requireFeature(device, FeatureCategory.Humidity, ctx, 'humidity sensor');
 
   if (!humidityFeature) {
     return null;
@@ -32,7 +31,7 @@ export function createHumiditySensor(device: Device, ctx: DeviceFactoryContext):
 }
 
 export function createOccupancySensor(device: Device, ctx: DeviceFactoryContext): EndpointResult | null {
-  const motionFeature = requireFeature(device, FeatureType.Motion, ctx, 'occupancy sensor');
+  const motionFeature = requireFeature(device, FeatureCategory.Motion, ctx, 'occupancy sensor');
 
   if (!motionFeature) {
     return null;
@@ -50,7 +49,7 @@ export function createOccupancySensor(device: Device, ctx: DeviceFactoryContext)
 }
 
 export function createContactSensor(device: Device, ctx: DeviceFactoryContext): EndpointResult | null {
-  const doorFeature = requireFeature(device, FeatureType.DoorState, ctx, 'contact sensor');
+  const doorFeature = requireFeature(device, FeatureCategory.DoorState, ctx, 'contact sensor');
 
   if (!doorFeature) {
     return null;

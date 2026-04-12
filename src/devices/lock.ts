@@ -1,14 +1,13 @@
 import { doorLockDevice } from 'matterbridge';
 import { DoorLock, PowerSource } from 'matterbridge/matter/clusters';
 
-import type { Device } from 'iotas-ts';
+import { FeatureCategory, findFeatureByCategory, type Device } from 'iotas-ts';
 
 import type { DeviceFactoryContext, EndpointResult } from './types.js';
-import { bridgedNode, createBridgedEndpoint, findFeature, multiFeatureResult, requireFeature } from './helpers.js';
-import { FeatureType } from '../constants.js';
+import { bridgedNode, createBridgedEndpoint, multiFeatureResult, requireFeature } from './helpers.js';
 
 export function createDoorLock(device: Device, ctx: DeviceFactoryContext): EndpointResult | null {
-  const lockFeature = requireFeature(device, FeatureType.Lock, ctx, 'door lock');
+  const lockFeature = requireFeature(device, FeatureCategory.Lock, ctx, 'door lock');
 
   if (!lockFeature) {
     return null;
@@ -44,7 +43,7 @@ export function createDoorLock(device: Device, ctx: DeviceFactoryContext): Endpo
     ],
   ]);
 
-  const batteryFeature = findFeature(device, FeatureType.Battery);
+  const batteryFeature = findFeatureByCategory(device, FeatureCategory.Battery);
   if (batteryFeature) {
     const batteryPercent = Math.min(Math.round(batteryFeature.value ?? 0), 100);
     const matterPercent = batteryPercent * 2; // Matter uses 0-200 (0.5% steps)
