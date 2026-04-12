@@ -52,6 +52,8 @@ export class IotasPlatform extends MatterbridgeDynamicPlatform {
     this.iotasClient = IotasClient.withCredentials(log, config.username, config.password, config.unit);
     this.featureCache = new FeatureCache(log, this.iotasClient, {
       pollIntervalMs: this.pollingInterval * 1000,
+      // Increased to 15s as lock takes ~10s to acquire in worst case, and we want to avoid unnecessary retries
+      writeBarrierMs: 15_000,
       snapshotFilter: this.createSnapshotFilter(),
     });
 
