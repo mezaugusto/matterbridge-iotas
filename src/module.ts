@@ -126,8 +126,8 @@ export class IotasPlatform extends MatterbridgeDynamicPlatform {
     const ctx: DeviceFactoryContext = {
       log: this.log,
       debug: this.config.debug ?? false,
-      onFeatureUpdate: async (featureId: number, value: number) => {
-        await this.iotasClient.updateFeature(featureId.toString(), value);
+      onFeatureUpdate: (featureId: number, value: number) => {
+        this.iotasClient.updateFeature(featureId.toString(), value);
         this.featureCache.set(featureId.toString(), value);
       },
     };

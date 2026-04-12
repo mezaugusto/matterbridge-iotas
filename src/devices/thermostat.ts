@@ -77,9 +77,9 @@ export function createThermostat(device: Device, ctx: DeviceFactoryContext): End
     endpoint.subscribeAttribute(
       Thermostat.Cluster.id,
       'systemMode',
-      async (newValue: Thermostat.SystemMode) => {
+      (newValue: Thermostat.SystemMode) => {
         const iotasMode = systemModeToIotasMode(newValue);
-        await ctx.onFeatureUpdate(modeFeature.id, iotasMode);
+        ctx.onFeatureUpdate(modeFeature.id, iotasMode);
       },
     );
   }
@@ -89,9 +89,9 @@ export function createThermostat(device: Device, ctx: DeviceFactoryContext): End
     endpoint.subscribeAttribute(
       Thermostat.Cluster.id,
       'occupiedHeatingSetpoint',
-      async (newValue: number) => {
+      (newValue: number) => {
         const fahrenheit = fromMatterCentiCelsius(newValue);
-        await ctx.onFeatureUpdate(heatSetpointFeature.id, fahrenheit);
+        ctx.onFeatureUpdate(heatSetpointFeature.id, fahrenheit);
       },
     );
   }
@@ -101,9 +101,9 @@ export function createThermostat(device: Device, ctx: DeviceFactoryContext): End
     endpoint.subscribeAttribute(
       Thermostat.Cluster.id,
       'occupiedCoolingSetpoint',
-      async (newValue: number) => {
+      (newValue: number) => {
         const fahrenheit = fromMatterCentiCelsius(newValue);
-        await ctx.onFeatureUpdate(coolSetpointFeature.id, fahrenheit);
+        ctx.onFeatureUpdate(coolSetpointFeature.id, fahrenheit);
       },
     );
   }

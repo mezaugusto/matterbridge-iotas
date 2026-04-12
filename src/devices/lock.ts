@@ -22,12 +22,12 @@ export function createDoorLock(device: Device, ctx: DeviceFactoryContext): Endpo
     .addRequiredClusterServers();
 
   endpoint.addCommandHandler('lockDoor', async () => {
-    await ctx.onFeatureUpdate(lockFeature.id, 1);
+    ctx.onFeatureUpdate(lockFeature.id, 1);
     await endpoint.setAttribute(DoorLock.Cluster.id, 'lockState', DoorLock.LockState.Locked);
   });
 
   endpoint.addCommandHandler('unlockDoor', async () => {
-    await ctx.onFeatureUpdate(lockFeature.id, 0);
+    ctx.onFeatureUpdate(lockFeature.id, 0);
     await endpoint.setAttribute(DoorLock.Cluster.id, 'lockState', DoorLock.LockState.Unlocked);
   });
 

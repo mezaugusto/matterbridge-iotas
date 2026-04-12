@@ -37,7 +37,7 @@ export function createDimmableLight(device: Device, ctx: DeviceFactoryContext): 
   endpoint.addCommandHandler('moveToLevel', async ({ request }) => {
     const matterLevel = request.level;
     const iotasLevel = fromMatterLevel(matterLevel);
-    await ctx.onFeatureUpdate(levelFeature.id, iotasLevel);
+    ctx.onFeatureUpdate(levelFeature.id, iotasLevel);
     await endpoint.setAttribute(LevelControl.Cluster.id, 'currentLevel', matterLevel);
   });
 
