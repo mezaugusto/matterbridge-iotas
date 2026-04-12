@@ -1,5 +1,17 @@
 # Changelog
 
+## [1.1.3](https://github.com/mezaugusto/matterbridge-iotas/compare/v1.0.2...v1.1.3) (2026-04-12)
+
+
+### Bug Fixes
+
+* :bug: Fix dimmer lights not showing ([#10](https://github.com/mezaugusto/matterbridge-iotas/issues/10)) ([ea56bd7](https://github.com/mezaugusto/matterbridge-iotas/commit/ea56bd7641edd71d119779ad5d32bd66eeb8eb5b))
+
+
+### Miscellaneous Chores
+
+* release 1.1.3 ([#12](https://github.com/mezaugusto/matterbridge-iotas/issues/12)) Release-As: 1.1.3 ([6a15143](https://github.com/mezaugusto/matterbridge-iotas/commit/6a15143b05f92e5475dfa0e8ccf3b33c3a388dc1))
+
 ## [1.0.2](https://github.com/mezaugusto/matterbridge-iotas/compare/v1.0.1...v1.0.2) (2026-04-12)
 
 
