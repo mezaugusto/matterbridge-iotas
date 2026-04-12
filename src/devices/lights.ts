@@ -98,7 +98,8 @@ export function createDimmableLight(device: Device, ctx: DeviceFactoryContext): 
     return null;
   }
 
-  const level = toMatterLevel(levelFeature.value ?? 0);
+  // Matter LevelControl minLevel defaults to 1; clamp initial value to avoid constraint violation
+  const level = Math.max(toMatterLevel(levelFeature.value ?? 0), 1);
 
   if (onOffFeature) {
     return createStandardDimmableLight(device, ctx, onOffFeature, levelFeature, level);
