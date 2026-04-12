@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.0.2](https://github.com/mezaugusto/matterbridge-iotas/compare/v1.0.1...v1.0.2) (2026-04-12)
+
+
+### Bug Fixes
+
+* :bug: dimmable lights not showing ([#6](https://github.com/mezaugusto/matterbridge-iotas/issues/6)) ([d15f5a7](https://github.com/mezaugusto/matterbridge-iotas/commit/d15f5a7cf67fac017d75d9a623dc6c4c68423775))
+
 ## [1.0.1](https://github.com/mezaugusto/matterbridge-iotas/compare/v1.0.0...v1.0.1) (2026-04-12)
 
 
