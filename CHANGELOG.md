@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.0.0 (2026-04-12)
+
+
+### Features
+
+* :sparkles: Use iotas v1 fire and forget for update ([#2](https://github.com/mezaugusto/matterbridge-iotas/issues/2)) ([f225ec6](https://github.com/mezaugusto/matterbridge-iotas/commit/f225ec66baa98f64e59e84e8afee9035aedb5aeb))
+
 ## 0.1.0
 
 ### Features
