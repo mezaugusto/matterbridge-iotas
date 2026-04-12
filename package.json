@@ -1,6 +1,6 @@
 {
   "name": "matterbridge-iotas",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Matterbridge plugin for IOTAS smart home devices",
   "author": "Augusto Meza <mezaugusto@proton.me>",
   "license": "Apache-2.0",
