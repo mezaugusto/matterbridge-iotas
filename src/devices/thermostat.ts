@@ -74,44 +74,35 @@ export function createThermostat(device: Device, ctx: DeviceFactoryContext): End
 
   // Command handler: system mode changes from Matter controller
   if (modeFeature) {
-    endpoint.subscribeAttribute(
-      Thermostat.Cluster.id,
-      'systemMode',
-      (newValue: Thermostat.SystemMode) => {
-        const iotasMode = systemModeToIotasMode(newValue);
-        ctx.onFeatureUpdate(modeFeature.id, iotasMode);
-      },
-    );
+    endpoint.subscribeAttribute(Thermostat.Cluster.id, 'systemMode', (newValue: Thermostat.SystemMode) => {
+      const iotasMode = systemModeToIotasMode(newValue);
+      ctx.onFeatureUpdate(modeFeature.id, iotasMode);
+    });
   }
 
   // Command handler: heating setpoint changes from Matter controller
   if (heatSetpointFeature) {
-    endpoint.subscribeAttribute(
-      Thermostat.Cluster.id,
-      'occupiedHeatingSetpoint',
-      (newValue: number) => {
-        const fahrenheit = fromMatterCentiCelsius(newValue);
-        ctx.onFeatureUpdate(heatSetpointFeature.id, fahrenheit);
-      },
-    );
+    endpoint.subscribeAttribute(Thermostat.Cluster.id, 'occupiedHeatingSetpoint', (newValue: number) => {
+      const fahrenheit = fromMatterCentiCelsius(newValue);
+      ctx.onFeatureUpdate(heatSetpointFeature.id, fahrenheit);
+    });
   }
 
   // Command handler: cooling setpoint changes from Matter controller
   if (coolSetpointFeature) {
-    endpoint.subscribeAttribute(
-      Thermostat.Cluster.id,
-      'occupiedCoolingSetpoint',
-      (newValue: number) => {
-        const fahrenheit = fromMatterCentiCelsius(newValue);
-        ctx.onFeatureUpdate(coolSetpointFeature.id, fahrenheit);
-      },
-    );
+    endpoint.subscribeAttribute(Thermostat.Cluster.id, 'occupiedCoolingSetpoint', (newValue: number) => {
+      const fahrenheit = fromMatterCentiCelsius(newValue);
+      ctx.onFeatureUpdate(coolSetpointFeature.id, fahrenheit);
+    });
   }
 
   const handlers = new Map<number, (value: number) => void>([
-    [tempFeature.id, (value) => {
-      endpoint.setAttribute(Thermostat.Cluster.id, 'localTemperature', toMatterCentiCelsius(value));
-    }],
+    [
+      tempFeature.id,
+      (value) => {
+        endpoint.setAttribute(Thermostat.Cluster.id, 'localTemperature', toMatterCentiCelsius(value));
+      },
+    ],
   ]);
 
   if (modeFeature) {

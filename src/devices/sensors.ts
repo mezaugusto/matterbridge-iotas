@@ -4,7 +4,13 @@ import { BooleanState, OccupancySensing, RelativeHumidityMeasurement } from 'mat
 import type { Device } from 'iotas-ts';
 
 import type { DeviceFactoryContext, EndpointResult } from './types.js';
-import { bridgedNode, createBridgedEndpoint, requireFeature, singleFeatureResult, toMatterHumidity } from './helpers.js';
+import {
+  bridgedNode,
+  createBridgedEndpoint,
+  requireFeature,
+  singleFeatureResult,
+  toMatterHumidity,
+} from './helpers.js';
 import { FeatureType } from '../constants.js';
 
 export function createHumiditySensor(device: Device, ctx: DeviceFactoryContext): EndpointResult | null {

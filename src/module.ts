@@ -142,14 +142,11 @@ export class IotasPlatform extends MatterbridgeDynamicPlatform {
         await this.registerDevice(result.endpoint);
 
         // Subscribe to feature changes via the cache
-        const unsubscribe = this.featureCache.subscribe(
-          result.featureIds.map(String),
-          (changed) => {
-            for (const [fid, value] of changed) {
-              result.updateAttribute(Number(fid), value);
-            }
-          },
-        );
+        const unsubscribe = this.featureCache.subscribe(result.featureIds.map(String), (changed) => {
+          for (const [fid, value] of changed) {
+            result.updateAttribute(Number(fid), value);
+          }
+        });
 
         this.deviceMap.set(device.id, {
           endpoint: result.endpoint,
@@ -157,7 +154,8 @@ export class IotasPlatform extends MatterbridgeDynamicPlatform {
           unsubscribe,
         });
 
-        this.log.info(`Registered device: ${device.name} (${device.category})`);      }
+        this.log.info(`Registered device: ${device.name} (${device.category})`);
+      }
     }
   }
 

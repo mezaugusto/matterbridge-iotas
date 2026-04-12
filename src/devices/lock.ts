@@ -21,39 +21,43 @@ export function createDoorLock(device: Device, ctx: DeviceFactoryContext): Endpo
     .createDefaultDoorLockClusterServer(lockState)
     .addRequiredClusterServers();
 
-  endpoint.addCommandHandler('lockDoor', async () => {
+  endpoint.addCommandHandler('lockDoor', () => {
     ctx.onFeatureUpdate(lockFeature.id, 1);
-    await endpoint.setAttribute(DoorLock.Cluster.id, 'lockState', DoorLock.LockState.Locked);
+    endpoint.setAttribute(DoorLock.Cluster.id, 'lockState', DoorLock.LockState.Locked);
   });
 
-  endpoint.addCommandHandler('unlockDoor', async () => {
+  endpoint.addCommandHandler('unlockDoor', () => {
     ctx.onFeatureUpdate(lockFeature.id, 0);
-    await endpoint.setAttribute(DoorLock.Cluster.id, 'lockState', DoorLock.LockState.Unlocked);
+    endpoint.setAttribute(DoorLock.Cluster.id, 'lockState', DoorLock.LockState.Unlocked);
   });
 
   const handlers = new Map<number, (value: number) => void>([
-    [lockFeature.id, (value) => {
-      endpoint.setAttribute(
-        DoorLock.Cluster.id,
-        'lockState',
-        value === 1 ? DoorLock.LockState.Locked : DoorLock.LockState.Unlocked,
-      );
-    }],
+    [
+      lockFeature.id,
+      (value) => {
+        endpoint.setAttribute(
+          DoorLock.Cluster.id,
+          'lockState',
+          value === 1 ? DoorLock.LockState.Locked : DoorLock.LockState.Unlocked,
+        );
+      },
+    ],
   ]);
 
   const batteryFeature = findFeature(device, FeatureType.Battery);
   if (batteryFeature) {
-    const batteryLevel = Math.round((batteryFeature.value ?? 0) * 100);
+    const batteryPercent = Math.min(Math.round(batteryFeature.value ?? 0), 100);
+    const matterPercent = batteryPercent * 2; // Matter uses 0-200 (0.5% steps)
     endpoint.createDefaultPowerSourceReplaceableBatteryClusterServer(
-      batteryLevel,
-      batteryLevel < 20 ? PowerSource.BatChargeLevel.Critical : PowerSource.BatChargeLevel.Ok,
-      batteryLevel * 30,
+      matterPercent,
+      batteryPercent < 20 ? PowerSource.BatChargeLevel.Critical : PowerSource.BatChargeLevel.Ok,
+      batteryPercent * 30,
       'CR123A',
       1,
       PowerSource.BatReplaceability.UserReplaceable,
     );
     handlers.set(batteryFeature.id, (value) => {
-      const percent = Math.round(value * 100);
+      const percent = Math.min(Math.round(value), 100);
       endpoint.setAttribute(PowerSource.Cluster.id, 'batPercentRemaining', percent * 2);
       endpoint.setAttribute(
         PowerSource.Cluster.id,

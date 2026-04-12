@@ -119,13 +119,13 @@ export function fromMatterCentiCelsius(centiCelsius: number): number {
  * Add standard on/off command handlers to an endpoint.
  */
 export function addOnOffHandlers(endpoint: MatterbridgeEndpoint, featureId: number, ctx: DeviceFactoryContext): void {
-  endpoint.addCommandHandler('on', async () => {
+  endpoint.addCommandHandler('on', () => {
     ctx.onFeatureUpdate(featureId, 1);
-    await endpoint.setAttribute(OnOff.Cluster.id, 'onOff', true);
+    endpoint.setAttribute(OnOff.Cluster.id, 'onOff', true);
   });
-  endpoint.addCommandHandler('off', async () => {
+  endpoint.addCommandHandler('off', () => {
     ctx.onFeatureUpdate(featureId, 0);
-    await endpoint.setAttribute(OnOff.Cluster.id, 'onOff', false);
+    endpoint.setAttribute(OnOff.Cluster.id, 'onOff', false);
   });
 }
 

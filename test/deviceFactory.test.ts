@@ -168,8 +168,16 @@ describe('createEndpointForDevice (router)', () => {
     const device = makeDevice({
       category: 'switch',
       physicalDeviceDescription: {
-        id: 1, name: 'Smartplug', manufacturer: 'GE', model: 'ZW4103', protocol: 'Z-Wave',
-        secure: false, movable: false, external: false, deviceSpecificKey: false, isActive: true,
+        id: 1,
+        name: 'Smartplug',
+        manufacturer: 'GE',
+        model: 'ZW4103',
+        protocol: 'Z-Wave',
+        secure: false,
+        movable: false,
+        external: false,
+        deviceSpecificKey: false,
+        isActive: true,
       },
       features: [makeFeature({ id: 10, eventTypeName: 'OnOff', isLight: false, value: 0 })],
     });
