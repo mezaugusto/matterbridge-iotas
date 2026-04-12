@@ -21,11 +21,14 @@ describe('lights', () => {
       assert.deepEqual(result.featureIds, [10, 11]);
     });
 
-    it('should return null when OnOff feature is missing', () => {
+    it('should create a level-only dimmable light when OnOff feature is missing', () => {
       const device = makeDevice({
+        name: 'Hall lights',
+        category: 'dimmer',
         features: [makeFeature({ id: 11, eventTypeName: 'Level', value: 0.5 })],
       });
-      assert.equal(createDimmableLight(device, ctx), null);
+      const result = assertResult(createDimmableLight(device, ctx));
+      assert.deepEqual(result.featureIds, [11]);
     });
 
     it('should return null when Level feature is missing', () => {
