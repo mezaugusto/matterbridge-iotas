@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.0.1](https://github.com/mezaugusto/matterbridge-iotas/compare/v1.0.0...v1.0.1) (2026-04-12)
+
+
+### Bug Fixes
+
+* :bug: fix deadlock on feature update ([#4](https://github.com/mezaugusto/matterbridge-iotas/issues/4)) ([e38bb09](https://github.com/mezaugusto/matterbridge-iotas/commit/e38bb09c92281fb3c1057eaeb397eeaf25f52590))
+
 ## 1.0.0 (2026-04-12)
 
 
