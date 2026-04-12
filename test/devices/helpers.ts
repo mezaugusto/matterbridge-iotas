@@ -13,6 +13,24 @@ export function makeLog(): AnsiLogger {
   return new AnsiLogger({ logName: 'test', logLevel: LogLevel.NONE });
 }
 
+/**
+ * Suppress console output while running a function.
+ * Matterbridge logs warnings when calling setAttribute on inactive endpoints
+ * (expected in unit tests where endpoints aren't registered).
+ */
+export function suppressLogs(fn: () => void): void {
+  const origLog = console.log;
+  const origErr = console.error;
+  console.log = () => {};
+  console.error = () => {};
+  try {
+    fn();
+  } finally {
+    console.log = origLog;
+    console.error = origErr;
+  }
+}
+
 /** Assert result is non-null and return it. */
 export function assertResult(result: EndpointResult | null): EndpointResult {
   assert.ok(result, 'Expected non-null result');

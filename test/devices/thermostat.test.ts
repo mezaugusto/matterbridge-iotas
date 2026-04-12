@@ -4,7 +4,7 @@ import assert from 'node:assert/strict';
 import { Thermostat } from 'matterbridge/matter/clusters';
 
 import { createThermostat, iotasModeToSystemMode } from '../../src/devices/thermostat.js';
-import { assertResult, makeCtx, makeDevice, makeFeature } from './helpers.js';
+import { assertResult, makeCtx, makeDevice, makeFeature, suppressLogs } from './helpers.js';
 
 describe('thermostat', () => {
   const ctx = makeCtx();
@@ -49,12 +49,14 @@ describe('thermostat', () => {
     const result = assertResult(createThermostat(device, ctx));
 
     // Should not throw for any tracked feature
-    assert.doesNotThrow(() => result.updateAttribute(30, 75));
-    assert.doesNotThrow(() => result.updateAttribute(31, 2));
-    assert.doesNotThrow(() => result.updateAttribute(32, 70));
-    assert.doesNotThrow(() => result.updateAttribute(33, 78));
-    // Untracked feature should be a no-op
-    assert.doesNotThrow(() => result.updateAttribute(999, 0));
+    suppressLogs(() => {
+      assert.doesNotThrow(() => result.updateAttribute(30, 75));
+      assert.doesNotThrow(() => result.updateAttribute(31, 2));
+      assert.doesNotThrow(() => result.updateAttribute(32, 70));
+      assert.doesNotThrow(() => result.updateAttribute(33, 78));
+      // Untracked feature should be a no-op
+      assert.doesNotThrow(() => result.updateAttribute(999, 0));
+    });
   });
 });
 

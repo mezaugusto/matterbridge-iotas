@@ -42,6 +42,7 @@
     "lint": "eslint . --max-warnings=0",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
+    "pretest": "npm link matterbridge --no-fund --no-audit",
     "test": "tsc && node --test --test-force-exit dist/test/*.test.js dist/test/devices/*.test.js",
     "test:no-force-exit": "tsc && node --test dist/test/*.test.js dist/test/devices/*.test.js",
     "prepublishOnly": "npm run lint && npm run build"

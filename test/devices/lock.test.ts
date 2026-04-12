@@ -2,7 +2,7 @@ import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
 
 import { createDoorLock } from '../../src/devices/lock.js';
-import { assertResult, makeCtx, makeDevice, makeFeature } from './helpers.js';
+import { assertResult, makeCtx, makeDevice, makeFeature, suppressLogs } from './helpers.js';
 
 describe('lock', () => {
   const ctx = makeCtx();
@@ -38,9 +38,9 @@ describe('lock', () => {
     });
     const result = assertResult(createDoorLock(device, ctx));
 
-    assert.doesNotThrow(() => result.updateAttribute(20, 0));
-    assert.doesNotThrow(() => result.updateAttribute(21, 0.5));
-    assert.doesNotThrow(() => result.updateAttribute(999, 0));
+    assert.doesNotThrow(() => suppressLogs(() => result.updateAttribute(20, 0)));
+    assert.doesNotThrow(() => suppressLogs(() => result.updateAttribute(21, 0.5)));
+    assert.doesNotThrow(() => suppressLogs(() => result.updateAttribute(999, 0)));
   });
 
   it('should return null when lock feature is missing', () => {
