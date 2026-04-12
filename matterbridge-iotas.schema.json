@@ -34,6 +34,26 @@
       "title": "Unit Name",
       "description": "Optional: specify which unit to use if you have multiple units"
     },
+    "whiteList": {
+      "title": "White List",
+      "description": "Only the devices in the list will be exposed. If the list is empty, all devices will be exposed.",
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "uniqueItems": true,
+      "selectFrom": "name"
+    },
+    "blackList": {
+      "title": "Black List",
+      "description": "The devices in the list will not be exposed. If the list is empty, no devices will be excluded.",
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "uniqueItems": true,
+      "selectFrom": "name"
+    },
     "pollingInterval": {
       "type": "integer",
       "title": "Polling Interval (seconds)",
