@@ -34,17 +34,23 @@ export function createDimmableLight(device: Device, ctx: DeviceFactoryContext): 
 
   addOnOffHandlers(endpoint, onOffFeature.id, ctx);
 
-  endpoint.addCommandHandler('moveToLevel', async ({ request }) => {
+  endpoint.addCommandHandler('moveToLevel', ({ request }) => {
     const matterLevel = request.level;
     const iotasLevel = fromMatterLevel(matterLevel);
     ctx.onFeatureUpdate(levelFeature.id, iotasLevel);
-    await endpoint.setAttribute(LevelControl.Cluster.id, 'currentLevel', matterLevel);
+    endpoint.setAttribute(LevelControl.Cluster.id, 'currentLevel', matterLevel);
   });
 
-  return multiFeatureResult(endpoint, new Map([
-    [onOffFeature.id, (value) => endpoint.setAttribute(OnOff.Cluster.id, 'onOff', value === 1)],
-    [levelFeature.id, (value) => endpoint.setAttribute(LevelControl.Cluster.id, 'currentLevel', toMatterLevel(value))],
-  ]));
+  return multiFeatureResult(
+    endpoint,
+    new Map([
+      [onOffFeature.id, (value) => endpoint.setAttribute(OnOff.Cluster.id, 'onOff', value === 1)],
+      [
+        levelFeature.id,
+        (value) => endpoint.setAttribute(LevelControl.Cluster.id, 'currentLevel', toMatterLevel(value)),
+      ],
+    ]),
+  );
 }
 
 export function createOnOffLight(device: Device, ctx: DeviceFactoryContext): EndpointResult | null {

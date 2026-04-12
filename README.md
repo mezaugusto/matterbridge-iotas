@@ -15,16 +15,16 @@ Matterbridge plugin for IOTAS smart home devices. Bridges IOTAS devices to the M
 
 ## Supported Devices
 
-| IOTAS Device    | Matter Device Type | Clusters                      |
-| --------------- | ------------------ | ----------------------------- |
-| Dimmer          | Dimmable Light     | OnOff, LevelControl           |
-| Switch (light)  | On/Off Light       | OnOff                         |
-| Switch (outlet) | On/Off Outlet      | OnOff                         |
-| Door Lock       | Door Lock          | DoorLock                      |
-| Thermostat      | Thermostat         | Thermostat                    |
-| Humidity Sensor | Humidity Sensor    | RelativeHumidityMeasurement   |
-| Motion Sensor   | Occupancy Sensor   | OccupancySensing              |
-| Door Sensor     | Contact Sensor     | BooleanState                  |
+| IOTAS Device    | Matter Device Type | Clusters                    |
+| --------------- | ------------------ | --------------------------- |
+| Dimmer          | Dimmable Light     | OnOff, LevelControl         |
+| Switch (light)  | On/Off Light       | OnOff                       |
+| Switch (outlet) | On/Off Outlet      | OnOff                       |
+| Door Lock       | Door Lock          | DoorLock                    |
+| Thermostat      | Thermostat         | Thermostat                  |
+| Humidity Sensor | Humidity Sensor    | RelativeHumidityMeasurement |
+| Motion Sensor   | Occupancy Sensor   | OccupancySensing            |
+| Door Sensor     | Contact Sensor     | BooleanState                |
 
 ## Installation
 
@@ -50,15 +50,15 @@ matterbridge -add .
 
 Configure via the Matterbridge web UI or edit `matterbridge-iotas.config.json`:
 
-| Field             | Type     | Required | Default | Description                                          |
-| ----------------- | -------- | -------- | ------- | ---------------------------------------------------- |
-| `username`        | string   | Yes      |         | IOTAS account email                                  |
-| `password`        | string   | Yes      |         | IOTAS account password                               |
-| `unit`            | string   | No       |         | Unit name (defaults to first found)                  |
-| `whiteList`       | string[] | No       | `[]`    | Only expose these devices (empty = expose all)       |
-| `blackList`       | string[] | No       | `[]`    | Exclude these devices (empty = exclude none)         |
-| `pollingInterval` | number   | No       | `5`     | Polling interval in seconds (5–300)                  |
-| `debug`           | boolean  | No       | `false` | Enable verbose debug logging                         |
+| Field             | Type     | Required | Default | Description                                    |
+| ----------------- | -------- | -------- | ------- | ---------------------------------------------- |
+| `username`        | string   | Yes      |         | IOTAS account email                            |
+| `password`        | string   | Yes      |         | IOTAS account password                         |
+| `unit`            | string   | No       |         | Unit name (defaults to first found)            |
+| `whiteList`       | string[] | No       | `[]`    | Only expose these devices (empty = expose all) |
+| `blackList`       | string[] | No       | `[]`    | Exclude these devices (empty = exclude none)   |
+| `pollingInterval` | number   | No       | `5`     | Polling interval in seconds (5–300)            |
+| `debug`           | boolean  | No       | `false` | Enable verbose debug logging                   |
 
 ## Development
 

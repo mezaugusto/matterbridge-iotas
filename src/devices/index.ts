@@ -1,7 +1,4 @@
-export type {
-  DeviceFactoryContext,
-  EndpointResult,
-} from './types.js';
+export type { DeviceFactoryContext, EndpointResult } from './types.js';
 
 export { createDimmableLight, createOnOffLight } from './lights.js';
 export { createOnOffOutlet } from './outlet.js';

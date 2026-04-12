@@ -16,10 +16,7 @@ import { createThermostat } from './devices/thermostat.js';
 import { createHumiditySensor, createOccupancySensor, createContactSensor } from './devices/sensors.js';
 
 // Re-export everything from devices/ so consumers can import from deviceFactory
-export type {
-  DeviceFactoryContext,
-  EndpointResult,
-} from './devices/index.js';
+export type { DeviceFactoryContext, EndpointResult } from './devices/index.js';
 
 export {
   createDimmableLight,
