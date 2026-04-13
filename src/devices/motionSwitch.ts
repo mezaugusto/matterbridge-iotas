@@ -15,7 +15,7 @@ export function addOccupancyChild(device: Device, result: EndpointResult, ctx: D
 
   const occupied = (motionFeature.value ?? 0) === 1;
 
-  result.endpoint
+  const occupancyChild = result.endpoint
     .addChildDeviceType('Occupancy', occupancySensor)
     .createDefaultOccupancySensingClusterServer(occupied)
     .addRequiredClusterServers();
@@ -27,7 +27,7 @@ export function addOccupancyChild(device: Device, result: EndpointResult, ctx: D
     featureIds: [...result.featureIds, motionFeature.id],
     updateAttribute(featureId, value) {
       if (featureId === motionFeature.id) {
-        result.endpoint.setAttribute(OccupancySensing.Cluster.id, 'occupancy', { occupied: value === 1 });
+        occupancyChild.setAttribute(OccupancySensing.Cluster.id, 'occupancy', { occupied: value === 1 });
       } else {
         originalUpdate(featureId, value);
       }

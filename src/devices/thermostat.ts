@@ -1,4 +1,4 @@
-import { fanDevice, humiditySensor, thermostatDevice } from 'matterbridge';
+import { fanDevice, humiditySensor, MatterbridgeEndpoint, thermostatDevice } from 'matterbridge';
 import { FanControl, RelativeHumidityMeasurement, Thermostat } from 'matterbridge/matter/clusters';
 
 import {
@@ -113,17 +113,19 @@ export function createThermostat(device: Device, ctx: DeviceFactoryContext): End
     .createDefaultThermostatClusterServer(currentTempC, heatSetpointC, coolSetpointC)
     .addRequiredClusterServers();
 
+  let humidityChild: MatterbridgeEndpoint | undefined;
   if (humidityFeature) {
     const humidity = toMatterHumidity(humidityFeature.value ?? 0);
-    endpoint
+    humidityChild = endpoint
       .addChildDeviceType('Humidity', humiditySensor)
       .createDefaultRelativeHumidityMeasurementClusterServer(humidity)
       .addRequiredClusterServers();
   }
 
+  let fanChild: MatterbridgeEndpoint | undefined;
   if (fanModeFeature) {
     const matterFanMode = iotasFanModeToMatter(fanModeFeature.value ?? 0);
-    endpoint
+    fanChild = endpoint
       .addChildDeviceType('Fan', fanDevice)
       .createDefaultFanControlClusterServer(matterFanMode)
       .addRequiredClusterServers();
@@ -150,8 +152,8 @@ export function createThermostat(device: Device, ctx: DeviceFactoryContext): End
     });
   }
 
-  if (fanModeFeature) {
-    endpoint.subscribeAttribute(FanControl.Cluster.id, 'fanMode', (newValue: FanControl.FanMode) => {
+  if (fanModeFeature && fanChild) {
+    fanChild.subscribeAttribute(FanControl.Cluster.id, 'fanMode', (newValue: FanControl.FanMode) => {
       const iotasMode = matterFanModeToIotas(newValue);
       ctx.onFeatureUpdate(fanModeFeature.id, iotasMode);
     });
@@ -181,14 +183,14 @@ export function createThermostat(device: Device, ctx: DeviceFactoryContext): End
       endpoint.setAttribute(Thermostat.Cluster.id, 'occupiedCoolingSetpoint', toMatterCentiCelsius(value));
     });
   }
-  if (humidityFeature) {
+  if (humidityFeature && humidityChild) {
     handlers.set(humidityFeature.id, (value) => {
-      endpoint.setAttribute(RelativeHumidityMeasurement.Cluster.id, 'measuredValue', toMatterHumidity(value));
+      humidityChild.setAttribute(RelativeHumidityMeasurement.Cluster.id, 'measuredValue', toMatterHumidity(value));
     });
   }
-  if (fanModeFeature) {
+  if (fanModeFeature && fanChild) {
     handlers.set(fanModeFeature.id, (value) => {
-      endpoint.setAttribute(FanControl.Cluster.id, 'fanMode', iotasFanModeToMatter(value));
+      fanChild.setAttribute(FanControl.Cluster.id, 'fanMode', iotasFanModeToMatter(value));
     });
   }
 
