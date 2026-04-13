@@ -40,12 +40,14 @@ function createStandardDimmableLight(
 
   addOnOffHandlers(endpoint, onOffFeature.id, ctx);
 
-  endpoint.addCommandHandler('moveToLevel', ({ request }) => {
+  const handleLevel = ({ request }: { request: { level: number } }) => {
     const matterLevel = request.level;
     const iotasLevel = fromMatterLevel(matterLevel);
     ctx.onFeatureUpdate(levelFeature.id, iotasLevel);
     endpoint.setAttribute(LevelControl.Cluster.id, 'currentLevel', clampLevel(matterLevel));
-  });
+  };
+  endpoint.addCommandHandler('moveToLevel', handleLevel);
+  endpoint.addCommandHandler('moveToLevelWithOnOff', handleLevel);
 
   return multiFeatureResult(
     endpoint,
@@ -83,13 +85,16 @@ function createLevelOnlyDimmableLight(
     endpoint.setAttribute(OnOff.Cluster.id, 'onOff', false);
   });
 
-  endpoint.addCommandHandler('moveToLevel', ({ request }) => {
+  const handleLevel = ({ request }: { request: { level: number } }) => {
     const matterLevel = request.level;
     const iotasLevel = fromMatterLevel(matterLevel);
     ctx.onFeatureUpdate(levelFeature.id, iotasLevel);
+    // When level=0, currentLevel is clamped to 1 (minLevel) while onOff=false handles the off state
     endpoint.setAttribute(LevelControl.Cluster.id, 'currentLevel', clampLevel(matterLevel));
     endpoint.setAttribute(OnOff.Cluster.id, 'onOff', matterLevel > 0);
-  });
+  };
+  endpoint.addCommandHandler('moveToLevel', handleLevel);
+  endpoint.addCommandHandler('moveToLevelWithOnOff', handleLevel);
 
   return singleFeatureResult(endpoint, levelFeature.id, (value) => {
     endpoint.setAttribute(LevelControl.Cluster.id, 'currentLevel', clampLevel(toMatterLevel(value)));
