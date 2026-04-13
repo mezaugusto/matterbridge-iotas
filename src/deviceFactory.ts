@@ -1,10 +1,3 @@
-/**
- * Device Factory - Router that maps IOTAS device categories to factory functions.
- *
- * Individual device factories live in src/devices/.
- * This module provides createEndpointForDevice (the router).
- */
-
 import { DeviceCategory, EventTypeName, FeatureCategory, isDeviceCategory, type Device } from 'iotas-ts';
 import type { DeviceFactoryContext, EndpointResult } from './devices/types.js';
 import { createDimmableLight, createOnOffLight } from './devices/lights.js';
@@ -12,16 +5,21 @@ import { createOnOffOutlet } from './devices/outlet.js';
 import { createDoorLock } from './devices/lock.js';
 import { createThermostat } from './devices/thermostat.js';
 import { createHumiditySensor, createOccupancySensor, createContactSensor } from './devices/sensors.js';
-
-// ---------------------------------------------------------------------------
-// Router
-// ---------------------------------------------------------------------------
+import { addOccupancyChild } from './devices/motionSwitch.js';
 
 type DeviceHandler = (device: Device, ctx: DeviceFactoryContext) => EndpointResult | null;
 
 function handleSwitch(device: Device, ctx: DeviceFactoryContext): EndpointResult | null {
   const isLight = device.features.some((f) => f.isLight);
   return isLight ? createOnOffLight(device, ctx) : createOnOffOutlet(device, ctx);
+}
+
+function handleMotionSwitch(device: Device, ctx: DeviceFactoryContext): EndpointResult | null {
+  const result = handleSwitch(device, ctx);
+  if (!result) {
+    return null;
+  }
+  return addOccupancyChild(device, result, ctx);
 }
 
 function handleDimmer(device: Device, ctx: DeviceFactoryContext): EndpointResult | null {
@@ -35,7 +33,7 @@ function handleDimmer(device: Device, ctx: DeviceFactoryContext): EndpointResult
 const categoryHandlers = new Map<DeviceCategory, DeviceHandler>([
   [DeviceCategory.Dimmer, handleDimmer],
   [DeviceCategory.Switch, handleSwitch],
-  [DeviceCategory.MotionSwitch, handleSwitch],
+  [DeviceCategory.MotionSwitch, handleMotionSwitch],
   [DeviceCategory.Lock, createDoorLock],
   [DeviceCategory.Thermostat, createThermostat],
   [DeviceCategory.Door, createContactSensor],
