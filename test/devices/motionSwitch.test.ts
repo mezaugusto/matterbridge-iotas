@@ -1,7 +1,7 @@
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
 
-import { assertResult, makeCtx, makeDevice, makeFeature, suppressLogs } from './helpers.js';
+import { assertResults, makeCtx, makeDevice, makeFeature, suppressLogs } from './helpers.js';
 
 import { createEndpointForDevice } from '../../src/deviceFactory.js';
 
@@ -16,9 +16,9 @@ describe('addOccupancyChild', () => {
         makeFeature({ id: 50, featureTypeCategory: 'motion', value: 0 }),
       ],
     });
-    const result = assertResult(createEndpointForDevice(device, ctx));
-    assert.ok(result.featureIds.includes(10), 'should include onOff feature');
-    assert.ok(result.featureIds.includes(50), 'should include motion feature');
+    const results = assertResults(createEndpointForDevice(device, ctx), 1);
+    assert.ok(results[0].featureIds.includes(10), 'should include onOff feature');
+    assert.ok(results[0].featureIds.includes(50), 'should include motion feature');
   });
 
   it('should work without motion feature (returns light only)', () => {
@@ -26,9 +26,9 @@ describe('addOccupancyChild', () => {
       category: 'motion_switch',
       features: [makeFeature({ id: 10, eventTypeName: 'OnOff', isLight: true, value: 0 })],
     });
-    const result = assertResult(createEndpointForDevice(device, ctx));
-    assert.ok(result.featureIds.includes(10));
-    assert.ok(!result.featureIds.includes(50), 'should not include motion feature');
+    const results = assertResults(createEndpointForDevice(device, ctx), 1);
+    assert.ok(results[0].featureIds.includes(10));
+    assert.ok(!results[0].featureIds.includes(50), 'should not include motion feature');
   });
 
   it('should create outlet with occupancy for non-light motion switch', () => {
@@ -39,9 +39,9 @@ describe('addOccupancyChild', () => {
         makeFeature({ id: 50, featureTypeCategory: 'motion', value: 1 }),
       ],
     });
-    const result = assertResult(createEndpointForDevice(device, ctx));
-    assert.ok(result.featureIds.includes(10));
-    assert.ok(result.featureIds.includes(50));
+    const results = assertResults(createEndpointForDevice(device, ctx), 1);
+    assert.ok(results[0].featureIds.includes(10));
+    assert.ok(results[0].featureIds.includes(50));
   });
 
   it('should delegate non-motion updates to original handler', () => {
@@ -52,20 +52,19 @@ describe('addOccupancyChild', () => {
         makeFeature({ id: 50, featureTypeCategory: 'motion', value: 0 }),
       ],
     });
-    const result = assertResult(createEndpointForDevice(device, ctx));
-    // updateAttribute for onOff should not throw (delegates to original)
+    const results = assertResults(createEndpointForDevice(device, ctx), 1);
     suppressLogs(() => {
-      result.updateAttribute(10, 0);
-      result.updateAttribute(50, 1);
+      results[0].updateAttribute(10, 0);
+      results[0].updateAttribute(50, 1);
     });
   });
 
-  it('should return null when switch has no OnOff feature', () => {
+  it('should return empty array when switch has no OnOff feature', () => {
     const device = makeDevice({
       category: 'motion_switch',
       features: [makeFeature({ id: 50, featureTypeCategory: 'motion', value: 0 })],
     });
-    const result = createEndpointForDevice(device, ctx);
-    assert.equal(result, null);
+    const results = createEndpointForDevice(device, ctx);
+    assert.deepEqual(results, []);
   });
 });

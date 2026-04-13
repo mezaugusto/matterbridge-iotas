@@ -7,7 +7,7 @@ import { createThermostat } from './devices/thermostat.js';
 import { createHumiditySensor, createOccupancySensor, createContactSensor } from './devices/sensors.js';
 import { addOccupancyChild } from './devices/motionSwitch.js';
 
-type DeviceHandler = (device: Device, ctx: DeviceFactoryContext) => EndpointResult | null;
+type DeviceHandler = (device: Device, ctx: DeviceFactoryContext) => EndpointResult | EndpointResult[] | null;
 
 function handleSwitch(device: Device, ctx: DeviceFactoryContext): EndpointResult | null {
   const isLight = device.features.some((f) => f.isLight);
@@ -52,27 +52,35 @@ const featureFallbacks: Array<{ category: FeatureCategory; handler: DeviceHandle
 ];
 
 /**
- * Main factory function - creates appropriate endpoint based on device category.
- */
-export function createEndpointForDevice(device: Device, ctx: DeviceFactoryContext): EndpointResult | null {
+ * Main factory function - creates appropriate endpoint(s) based on device category.
+\ */
+export function createEndpointForDevice(device: Device, ctx: DeviceFactoryContext): EndpointResult[] {
   if (!device.paired) {
     ctx.log.debug(`Skipping unpaired device: ${device.name}`);
-    return null;
+    return [];
   }
 
   if (isDeviceCategory(device.category)) {
     const handler = categoryHandlers.get(device.category);
     if (handler) {
-      return handler(device, ctx);
+      const result = handler(device, ctx);
+      if (!result) {
+        return [];
+      }
+      return Array.isArray(result) ? result : [result];
     }
   }
 
   for (const { category, handler: fallbackHandler } of featureFallbacks) {
     if (device.features.some((f) => f.featureTypeCategory === category)) {
-      return fallbackHandler(device, ctx);
+      const result = fallbackHandler(device, ctx);
+      if (!result) {
+        return [];
+      }
+      return Array.isArray(result) ? result : [result];
     }
   }
 
   ctx.log.warn(`Unsupported device category: ${device.category} for device ${device.name}`);
-  return null;
+  return [];
 }

@@ -6,6 +6,9 @@ import {
   FanMode,
   ThermostatMode,
   findFeatureByCategory,
+  getManufacturer,
+  getModel,
+  getSerialNumber,
   DEFAULT_CURRENT_TEMPERATURE_F,
   DEFAULT_HEAT_SETPOINT_F,
   DEFAULT_COOL_SETPOINT_F,
@@ -13,12 +16,14 @@ import {
 } from 'iotas-ts';
 
 import type { DeviceFactoryContext, EndpointResult } from './types.js';
+import { VENDOR_ID } from './types.js';
 import {
   bridgedNode,
   createBridgedEndpoint,
   fromMatterCentiCelsius,
   multiFeatureResult,
   requireFeature,
+  singleFeatureResult,
   toCelsius,
   toMatterCentiCelsius,
   toMatterHumidity,
@@ -93,7 +98,47 @@ function matterFanModeToIotas(matterMode: FanControl.FanMode): FanMode {
   }
 }
 
-export function createThermostat(device: Device, ctx: DeviceFactoryContext): EndpointResult | null {
+/**
+ * Create a standalone fan endpoint for a thermostat device.
+ * Fan must be a separate top-level endpoint — adding it as a child device type
+ * on the thermostat causes InvalidAction(128) during Matter subscriptions.
+ */
+function createFanEndpoint(
+  device: Device,
+  ctx: DeviceFactoryContext,
+  fanModeFeature: { id: number; value?: number | null },
+): EndpointResult {
+  const matterFanMode = iotasFanModeToMatter(fanModeFeature.value ?? 0);
+
+  const fanEndpoint = new MatterbridgeEndpoint([fanDevice, bridgedNode], { id: `iotas-${device.id}-fan` }, ctx.debug)
+    .createDefaultIdentifyClusterServer()
+    .createDefaultBridgedDeviceBasicInformationClusterServer(
+      `${device.name} Fan`,
+      `${getSerialNumber(device)}-fan`,
+      VENDOR_ID,
+      getManufacturer(device),
+      getModel(device),
+    )
+    .createDefaultFanControlClusterServer(matterFanMode)
+    .addRequiredClusterServers();
+
+  fanEndpoint.subscribeAttribute(FanControl.Cluster.id, 'fanMode', (newValue: FanControl.FanMode) => {
+    const iotasMode = matterFanModeToIotas(newValue);
+    ctx.onFeatureUpdate(fanModeFeature.id, iotasMode);
+  });
+
+  return singleFeatureResult(fanEndpoint, fanModeFeature.id, (value) => {
+    fanEndpoint.setAttribute(FanControl.Cluster.id, 'fanMode', iotasFanModeToMatter(value));
+  });
+}
+
+/**
+ * Create endpoints for a thermostat device.
+ * Returns an array: the thermostat itself, plus a separate fan endpoint if present.
+ * Humidity is a child device type on the thermostat (matches Matter composed device pattern).
+ * Fan is a separate top-level endpoint (required to avoid InvalidAction errors).
+ */
+export function createThermostat(device: Device, ctx: DeviceFactoryContext): EndpointResult[] {
   const tempFeature = requireFeature(device, FeatureCategory.CurrentTemperature, ctx, 'thermostat');
   const modeFeature = findFeatureByCategory(device, FeatureCategory.ThermostatMode);
   const heatSetpointFeature = findFeatureByCategory(device, FeatureCategory.HeatSetPoint);
@@ -102,7 +147,7 @@ export function createThermostat(device: Device, ctx: DeviceFactoryContext): End
   const fanModeFeature = findFeatureByCategory(device, FeatureCategory.FanMode);
 
   if (!tempFeature) {
-    return null;
+    return [];
   }
 
   const currentTempC = toCelsius(tempFeature.value ?? DEFAULT_CURRENT_TEMPERATURE_F);
@@ -119,15 +164,6 @@ export function createThermostat(device: Device, ctx: DeviceFactoryContext): End
     humidityChild = endpoint
       .addChildDeviceType('Humidity', humiditySensor)
       .createDefaultRelativeHumidityMeasurementClusterServer(humidity)
-      .addRequiredClusterServers();
-  }
-
-  let fanChild: MatterbridgeEndpoint | undefined;
-  if (fanModeFeature) {
-    const matterFanMode = iotasFanModeToMatter(fanModeFeature.value ?? 0);
-    fanChild = endpoint
-      .addChildDeviceType('Fan', fanDevice)
-      .createDefaultFanControlClusterServer(matterFanMode)
       .addRequiredClusterServers();
   }
 
@@ -149,13 +185,6 @@ export function createThermostat(device: Device, ctx: DeviceFactoryContext): End
     endpoint.subscribeAttribute(Thermostat.Cluster.id, 'occupiedCoolingSetpoint', (newValue: number) => {
       const fahrenheit = fromMatterCentiCelsius(newValue);
       ctx.onFeatureUpdate(coolSetpointFeature.id, fahrenheit);
-    });
-  }
-
-  if (fanModeFeature && fanChild) {
-    fanChild.subscribeAttribute(FanControl.Cluster.id, 'fanMode', (newValue: FanControl.FanMode) => {
-      const iotasMode = matterFanModeToIotas(newValue);
-      ctx.onFeatureUpdate(fanModeFeature.id, iotasMode);
     });
   }
 
@@ -188,11 +217,12 @@ export function createThermostat(device: Device, ctx: DeviceFactoryContext): End
       humidityChild.setAttribute(RelativeHumidityMeasurement.Cluster.id, 'measuredValue', toMatterHumidity(value));
     });
   }
-  if (fanModeFeature && fanChild) {
-    handlers.set(fanModeFeature.id, (value) => {
-      fanChild.setAttribute(FanControl.Cluster.id, 'fanMode', iotasFanModeToMatter(value));
-    });
+
+  const results: EndpointResult[] = [multiFeatureResult(endpoint, handlers)];
+
+  if (fanModeFeature) {
+    results.push(createFanEndpoint(device, ctx, fanModeFeature));
   }
 
-  return multiFeatureResult(endpoint, handlers);
+  return results;
 }
