@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.2.2](https://github.com/mezaugusto/matterbridge-iotas/compare/v1.2.1...v1.2.2) (2026-04-13)
+
+
+### Bug Fixes
+
+* :bug: fix thermostat (and all devices) setAttribute errors  ([#24](https://github.com/mezaugusto/matterbridge-iotas/issues/24)) ([59cfdab](https://github.com/mezaugusto/matterbridge-iotas/commit/59cfdab8171fa685fda28fe44dffdbc887f3de5a))
+
 ## [1.2.1](https://github.com/mezaugusto/matterbridge-iotas/compare/v1.2.0...v1.2.1) (2026-04-13)
 
 
