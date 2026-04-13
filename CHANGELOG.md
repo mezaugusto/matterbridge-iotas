@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.1.5](https://github.com/mezaugusto/matterbridge-iotas/compare/v1.1.4...v1.1.5) (2026-04-13)
+
+
+### Bug Fixes
+
+* :bug: Register both moveToLevel AND moveToLevelWithOnOff handlers for… ([#15](https://github.com/mezaugusto/matterbridge-iotas/issues/15)) ([bf9fc17](https://github.com/mezaugusto/matterbridge-iotas/commit/bf9fc177d466a623b195881e4b08e7ffee2fdcc9))
+* Update iotas-ts ([#17](https://github.com/mezaugusto/matterbridge-iotas/issues/17)) ([a76d0e9](https://github.com/mezaugusto/matterbridge-iotas/commit/a76d0e9f8c2b4d0c2e7f8c82dbb0d52591fa9fe0))
+
 ## [1.1.4](https://github.com/mezaugusto/matterbridge-iotas/compare/v1.1.3...v1.1.4) (2026-04-13)
 
 
