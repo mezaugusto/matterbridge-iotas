@@ -9,7 +9,6 @@ Matterbridge plugin for IOTAS smart home devices. Bridges IOTAS devices to the M
 - Automatic device discovery by unit
 - Supports lights, switches, outlets, locks, thermostats, and sensors
 - Background polling with cached state
-- Write barrier to prevent UI rubber-banding after commands
 - Allow/deny list filtering for device exposure
 - Uses [iotas-ts](https://github.com/mezaugusto/iotas-ts) shared library
 

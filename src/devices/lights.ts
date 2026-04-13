@@ -85,16 +85,21 @@ function createLevelOnlyDimmableLight(
     endpoint.setAttribute(OnOff.Cluster.id, 'onOff', false);
   });
 
-  const handleLevel = ({ request }: { request: { level: number } }) => {
+  // moveToLevel doesn't affect onOff in Matterbridge, so we must set it ourselves for level-only devices
+  endpoint.addCommandHandler('moveToLevel', ({ request }) => {
     const matterLevel = request.level;
     const iotasLevel = fromMatterLevel(matterLevel);
     ctx.onFeatureUpdate(levelFeature.id, iotasLevel);
-    // When level=0, currentLevel is clamped to 1 (minLevel) while onOff=false handles the off state
     endpoint.setAttribute(LevelControl.Cluster.id, 'currentLevel', clampLevel(matterLevel));
     endpoint.setAttribute(OnOff.Cluster.id, 'onOff', matterLevel > 0);
-  };
-  endpoint.addCommandHandler('moveToLevel', handleLevel);
-  endpoint.addCommandHandler('moveToLevelWithOnOff', handleLevel);
+  });
+  // moveToLevelWithOnOff: Matterbridge's couple() sets onOff internally, so we only set currentLevel
+  endpoint.addCommandHandler('moveToLevelWithOnOff', ({ request }) => {
+    const matterLevel = request.level;
+    const iotasLevel = fromMatterLevel(matterLevel);
+    ctx.onFeatureUpdate(levelFeature.id, iotasLevel);
+    endpoint.setAttribute(LevelControl.Cluster.id, 'currentLevel', clampLevel(matterLevel));
+  });
 
   return singleFeatureResult(endpoint, levelFeature.id, (value) => {
     endpoint.setAttribute(LevelControl.Cluster.id, 'currentLevel', clampLevel(toMatterLevel(value)));
