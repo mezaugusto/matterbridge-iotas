@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.1.6](https://github.com/mezaugusto/matterbridge-iotas/compare/v1.1.5...v1.1.6) (2026-04-13)
+
+
+### Bug Fixes
+
+* :bug: Fix off setting in level lights ([#18](https://github.com/mezaugusto/matterbridge-iotas/issues/18)) ([09518e6](https://github.com/mezaugusto/matterbridge-iotas/commit/09518e65c229fda74dd0c9ad9544666d4784f54e))
+
 ## [1.1.5](https://github.com/mezaugusto/matterbridge-iotas/compare/v1.1.4...v1.1.5) (2026-04-13)
 
 
