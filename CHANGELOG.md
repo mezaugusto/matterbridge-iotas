@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.2.1](https://github.com/mezaugusto/matterbridge-iotas/compare/v1.2.0...v1.2.1) (2026-04-13)
+
+
+### Bug Fixes
+
+* :bug: Fix child devices not working ([#22](https://github.com/mezaugusto/matterbridge-iotas/issues/22)) ([f315469](https://github.com/mezaugusto/matterbridge-iotas/commit/f3154695a0e32cc53b8dd61d10b110784e2413a4))
+
 ## [1.2.0](https://github.com/mezaugusto/matterbridge-iotas/compare/v1.1.6...v1.2.0) (2026-04-13)
 
 
