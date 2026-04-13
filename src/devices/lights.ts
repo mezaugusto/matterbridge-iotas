@@ -15,6 +15,15 @@ import {
   toMatterLevel,
 } from './helpers.js';
 
+// Matter LevelControl with Lighting feature constrains currentLevel to [minLevel, maxLevel].
+// Defaults: minLevel=1, maxLevel=254. The on/off state is represented by the OnOff cluster.
+const MATTER_MIN_LEVEL = 1;
+const MATTER_MAX_LEVEL = 254;
+
+function clampLevel(level: number): number {
+  return Math.max(Math.min(level, MATTER_MAX_LEVEL), MATTER_MIN_LEVEL);
+}
+
 function createStandardDimmableLight(
   device: Device,
   ctx: DeviceFactoryContext,
@@ -35,7 +44,7 @@ function createStandardDimmableLight(
     const matterLevel = request.level;
     const iotasLevel = fromMatterLevel(matterLevel);
     ctx.onFeatureUpdate(levelFeature.id, iotasLevel);
-    endpoint.setAttribute(LevelControl.Cluster.id, 'currentLevel', matterLevel);
+    endpoint.setAttribute(LevelControl.Cluster.id, 'currentLevel', clampLevel(matterLevel));
   });
 
   return multiFeatureResult(
@@ -44,7 +53,7 @@ function createStandardDimmableLight(
       [onOffFeature.id, (value) => endpoint.setAttribute(OnOff.Cluster.id, 'onOff', value === 1)],
       [
         levelFeature.id,
-        (value) => endpoint.setAttribute(LevelControl.Cluster.id, 'currentLevel', toMatterLevel(value)),
+        (value) => endpoint.setAttribute(LevelControl.Cluster.id, 'currentLevel', clampLevel(toMatterLevel(value))),
       ],
     ]),
   );
@@ -67,24 +76,23 @@ function createLevelOnlyDimmableLight(
   endpoint.addCommandHandler('on', () => {
     ctx.onFeatureUpdate(levelFeature.id, 1);
     endpoint.setAttribute(OnOff.Cluster.id, 'onOff', true);
-    endpoint.setAttribute(LevelControl.Cluster.id, 'currentLevel', 254);
+    endpoint.setAttribute(LevelControl.Cluster.id, 'currentLevel', MATTER_MAX_LEVEL);
   });
   endpoint.addCommandHandler('off', () => {
     ctx.onFeatureUpdate(levelFeature.id, 0);
     endpoint.setAttribute(OnOff.Cluster.id, 'onOff', false);
-    endpoint.setAttribute(LevelControl.Cluster.id, 'currentLevel', 0);
   });
 
   endpoint.addCommandHandler('moveToLevel', ({ request }) => {
     const matterLevel = request.level;
     const iotasLevel = fromMatterLevel(matterLevel);
     ctx.onFeatureUpdate(levelFeature.id, iotasLevel);
-    endpoint.setAttribute(LevelControl.Cluster.id, 'currentLevel', matterLevel);
+    endpoint.setAttribute(LevelControl.Cluster.id, 'currentLevel', clampLevel(matterLevel));
     endpoint.setAttribute(OnOff.Cluster.id, 'onOff', matterLevel > 0);
   });
 
   return singleFeatureResult(endpoint, levelFeature.id, (value) => {
-    endpoint.setAttribute(LevelControl.Cluster.id, 'currentLevel', toMatterLevel(value));
+    endpoint.setAttribute(LevelControl.Cluster.id, 'currentLevel', clampLevel(toMatterLevel(value)));
     endpoint.setAttribute(OnOff.Cluster.id, 'onOff', value > 0);
   });
 }
@@ -98,8 +106,7 @@ export function createDimmableLight(device: Device, ctx: DeviceFactoryContext): 
     return null;
   }
 
-  // Matter LevelControl minLevel defaults to 1; clamp initial value to avoid constraint violation
-  const level = Math.max(toMatterLevel(levelFeature.value ?? 0), 1);
+  const level = clampLevel(toMatterLevel(levelFeature.value ?? 0));
 
   if (onOffFeature) {
     return createStandardDimmableLight(device, ctx, onOffFeature, levelFeature, level);
