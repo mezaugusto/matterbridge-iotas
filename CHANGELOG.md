@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.1.4](https://github.com/mezaugusto/matterbridge-iotas/compare/v1.1.3...v1.1.4) (2026-04-13)
+
+
+### Bug Fixes
+
+* :bug: Apply light value clamping through the app ([#13](https://github.com/mezaugusto/matterbridge-iotas/issues/13)) ([3fe8e60](https://github.com/mezaugusto/matterbridge-iotas/commit/3fe8e60e72959608f23e358e1c3d76d63313c047))
+
 ## [1.1.3](https://github.com/mezaugusto/matterbridge-iotas/compare/v1.0.2...v1.1.3) (2026-04-12)
 
 ### Bug Fixes
