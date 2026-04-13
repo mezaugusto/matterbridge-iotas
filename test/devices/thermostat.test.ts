@@ -32,7 +32,7 @@ describe('thermostat', () => {
     assert.deepEqual(results[0].featureIds, [30, 31, 32, 33]);
   });
 
-  it('should include humidity as child on thermostat endpoint', () => {
+  it('should create humidity as separate endpoint', () => {
     const device = makeDevice({
       category: 'thermostat',
       features: [
@@ -40,8 +40,9 @@ describe('thermostat', () => {
         makeFeature({ id: 34, featureTypeCategory: 'humidity', value: 45 }),
       ],
     });
-    const results = assertResults(createThermostat(device, ctx), 1);
-    assert.deepEqual(results[0].featureIds, [30, 34]);
+    const results = assertResults(createThermostat(device, ctx), 2);
+    assert.deepEqual(results[0].featureIds, [30]);
+    assert.deepEqual(results[1].featureIds, [34]);
   });
 
   it('should create fan as separate endpoint', () => {
@@ -57,7 +58,7 @@ describe('thermostat', () => {
     assert.deepEqual(results[1].featureIds, [35]);
   });
 
-  it('should return all features split across thermostat and fan endpoints', () => {
+  it('should return all features split across thermostat, humidity, and fan endpoints', () => {
     const device = makeDevice({
       category: 'thermostat',
       features: [
@@ -69,9 +70,10 @@ describe('thermostat', () => {
         makeFeature({ id: 35, featureTypeCategory: 'fan_mode', eventTypeName: 'FanMode', value: 0 }),
       ],
     });
-    const results = assertResults(createThermostat(device, ctx), 2);
-    assert.deepEqual(results[0].featureIds, [30, 31, 32, 33, 34]);
-    assert.deepEqual(results[1].featureIds, [35]);
+    const results = assertResults(createThermostat(device, ctx), 3);
+    assert.deepEqual(results[0].featureIds, [30, 31, 32, 33]);
+    assert.deepEqual(results[1].featureIds, [34]);
+    assert.deepEqual(results[2].featureIds, [35]);
   });
 
   it('should return empty array when temperature feature is missing', () => {
@@ -91,17 +93,21 @@ describe('thermostat', () => {
         makeFeature({ id: 35, featureTypeCategory: 'fan_mode', eventTypeName: 'FanMode', value: 0 }),
       ],
     });
-    const results = assertResults(createThermostat(device, ctx), 2);
+    const results = assertResults(createThermostat(device, ctx), 3);
 
     suppressLogs(() => {
+      // Thermostat endpoint
       assert.doesNotThrow(() => results[0].updateAttribute(30, 75));
       assert.doesNotThrow(() => results[0].updateAttribute(31, 2));
       assert.doesNotThrow(() => results[0].updateAttribute(32, 70));
       assert.doesNotThrow(() => results[0].updateAttribute(33, 78));
-      assert.doesNotThrow(() => results[0].updateAttribute(34, 50));
       assert.doesNotThrow(() => results[0].updateAttribute(999, 0));
-      assert.doesNotThrow(() => results[1].updateAttribute(35, 1));
+      // Humidity endpoint
+      assert.doesNotThrow(() => results[1].updateAttribute(34, 50));
       assert.doesNotThrow(() => results[1].updateAttribute(999, 0));
+      // Fan endpoint
+      assert.doesNotThrow(() => results[2].updateAttribute(35, 1));
+      assert.doesNotThrow(() => results[2].updateAttribute(999, 0));
     });
   });
 });
