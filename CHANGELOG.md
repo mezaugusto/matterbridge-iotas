@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.2.0](https://github.com/mezaugusto/matterbridge-iotas/compare/v1.1.6...v1.2.0) (2026-04-13)
+
+
+### Features
+
+* :sparkles: Extract motion sensor from motion lights ([#20](https://github.com/mezaugusto/matterbridge-iotas/issues/20)) ([729a094](https://github.com/mezaugusto/matterbridge-iotas/commit/729a094ae268b5e80b8399528908f3fd30f22149))
+
 ## [1.1.6](https://github.com/mezaugusto/matterbridge-iotas/compare/v1.1.5...v1.1.6) (2026-04-13)
 
 
