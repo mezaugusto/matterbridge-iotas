@@ -39,6 +39,15 @@ export function assertResult(result: EndpointResult | null): EndpointResult {
   return result;
 }
 
+export function assertResults(results: EndpointResult[], expectedCount: number): EndpointResult[] {
+  assert.equal(results.length, expectedCount, `Expected ${expectedCount} result(s), got ${results.length}`);
+  for (const r of results) {
+    assert.ok(Array.isArray(r.featureIds), 'Expected featureIds array');
+    assert.equal(typeof r.updateAttribute, 'function', 'Expected updateAttribute function');
+  }
+  return results;
+}
+
 export function makeCtx(overrides: Partial<DeviceFactoryContext> = {}): DeviceFactoryContext {
   return {
     log: makeLog(),

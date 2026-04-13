@@ -1,4 +1,5 @@
-import { MatterbridgeDynamicPlatform, MatterbridgeEndpoint, PlatformConfig, PlatformMatterbridge } from 'matterbridge';
+import { MatterbridgeDynamicPlatform, PlatformConfig, PlatformMatterbridge } from 'matterbridge';
+import type { MatterbridgeEndpoint } from 'matterbridge';
 import { AnsiLogger } from 'matterbridge/logger';
 import { FeatureCache, IotasClient, filterDevices } from 'iotas-ts';
 import type { Rooms, SnapshotFilter } from 'iotas-ts';
@@ -32,7 +33,7 @@ export class IotasPlatform extends MatterbridgeDynamicPlatform {
   featureCache: FeatureCache;
   pollingInterval: number;
 
-  private deviceMap: Map<number, DeviceEntry> = new Map();
+  private deviceEntries: DeviceEntry[] = [];
 
   constructor(matterbridge: PlatformMatterbridge, log: AnsiLogger, config: IotasPluginConfig) {
     super(matterbridge, log, config);
@@ -77,7 +78,7 @@ export class IotasPlatform extends MatterbridgeDynamicPlatform {
       await this.discoverDevices(rooms);
       this.featureCache.start();
 
-      this.log.info(`Discovered ${this.deviceMap.size} device(s)`);
+      this.log.info(`Discovered ${this.deviceEntries.length} endpoint(s)`);
     } catch (error) {
       this.log.error('Failed to start IOTAS platform:', error);
       throw error;
@@ -111,27 +112,25 @@ export class IotasPlatform extends MatterbridgeDynamicPlatform {
 
     for (const room of rooms) {
       for (const device of room.devices) {
-        const result = createEndpointForDevice(device, ctx);
-        if (!result) {
-          continue;
+        const results = createEndpointForDevice(device, ctx);
+
+        for (const result of results) {
+          await this.registerDevice(result.endpoint);
+
+          const unsubscribe = this.featureCache.subscribe(result.featureIds.map(String), (changed) => {
+            for (const [fid, value] of changed) {
+              result.updateAttribute(Number(fid), value);
+            }
+          });
+
+          this.deviceEntries.push({
+            endpoint: result.endpoint,
+            updateAttribute: result.updateAttribute,
+            unsubscribe,
+          });
+
+          this.log.info(`Registered endpoint: ${result.endpoint.id} (${device.name})`);
         }
-
-        await this.registerDevice(result.endpoint);
-
-        // Subscribe to feature changes via the cache
-        const unsubscribe = this.featureCache.subscribe(result.featureIds.map(String), (changed) => {
-          for (const [fid, value] of changed) {
-            result.updateAttribute(Number(fid), value);
-          }
-        });
-
-        this.deviceMap.set(device.id, {
-          endpoint: result.endpoint,
-          updateAttribute: result.updateAttribute,
-          unsubscribe,
-        });
-
-        this.log.info(`Registered device: ${device.name} (${device.category})`);
       }
     }
   }

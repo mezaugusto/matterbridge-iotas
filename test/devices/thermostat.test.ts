@@ -4,7 +4,7 @@ import assert from 'node:assert/strict';
 import { FanControl, Thermostat } from 'matterbridge/matter/clusters';
 
 import { createThermostat, iotasModeToSystemMode, iotasFanModeToMatter } from '../../src/devices/thermostat.js';
-import { assertResult, makeCtx, makeDevice, makeFeature, suppressLogs } from './helpers.js';
+import { assertResults, makeCtx, makeDevice, makeFeature, suppressLogs } from './helpers.js';
 
 describe('thermostat', () => {
   const ctx = makeCtx();
@@ -14,8 +14,8 @@ describe('thermostat', () => {
       category: 'thermostat',
       features: [makeFeature({ id: 30, featureTypeCategory: 'current_temperature', value: 72 })],
     });
-    const result = assertResult(createThermostat(device, ctx));
-    assert.deepEqual(result.featureIds, [30]);
+    const results = assertResults(createThermostat(device, ctx), 1);
+    assert.deepEqual(results[0].featureIds, [30]);
   });
 
   it('should include setpoints and mode when present', () => {
@@ -28,11 +28,11 @@ describe('thermostat', () => {
         makeFeature({ id: 33, featureTypeCategory: 'cool_set_point', value: 76 }),
       ],
     });
-    const result = assertResult(createThermostat(device, ctx));
-    assert.deepEqual(result.featureIds, [30, 31, 32, 33]);
+    const results = assertResults(createThermostat(device, ctx), 1);
+    assert.deepEqual(results[0].featureIds, [30, 31, 32, 33]);
   });
 
-  it('should include humidity when present', () => {
+  it('should include humidity as child on thermostat endpoint', () => {
     const device = makeDevice({
       category: 'thermostat',
       features: [
@@ -40,11 +40,11 @@ describe('thermostat', () => {
         makeFeature({ id: 34, featureTypeCategory: 'humidity', value: 45 }),
       ],
     });
-    const result = assertResult(createThermostat(device, ctx));
-    assert.deepEqual(result.featureIds, [30, 34]);
+    const results = assertResults(createThermostat(device, ctx), 1);
+    assert.deepEqual(results[0].featureIds, [30, 34]);
   });
 
-  it('should include fan mode when present', () => {
+  it('should create fan as separate endpoint', () => {
     const device = makeDevice({
       category: 'thermostat',
       features: [
@@ -52,11 +52,12 @@ describe('thermostat', () => {
         makeFeature({ id: 35, featureTypeCategory: 'fan_mode', eventTypeName: 'FanMode', value: 0 }),
       ],
     });
-    const result = assertResult(createThermostat(device, ctx));
-    assert.deepEqual(result.featureIds, [30, 35]);
+    const results = assertResults(createThermostat(device, ctx), 2);
+    assert.deepEqual(results[0].featureIds, [30]);
+    assert.deepEqual(results[1].featureIds, [35]);
   });
 
-  it('should include all optional features together', () => {
+  it('should return all features split across thermostat and fan endpoints', () => {
     const device = makeDevice({
       category: 'thermostat',
       features: [
@@ -68,12 +69,14 @@ describe('thermostat', () => {
         makeFeature({ id: 35, featureTypeCategory: 'fan_mode', eventTypeName: 'FanMode', value: 0 }),
       ],
     });
-    const result = assertResult(createThermostat(device, ctx));
-    assert.deepEqual(result.featureIds, [30, 31, 32, 33, 34, 35]);
+    const results = assertResults(createThermostat(device, ctx), 2);
+    assert.deepEqual(results[0].featureIds, [30, 31, 32, 33, 34]);
+    assert.deepEqual(results[1].featureIds, [35]);
   });
 
-  it('should return null when temperature feature is missing', () => {
-    assert.equal(createThermostat(makeDevice({ features: [] }), ctx), null);
+  it('should return empty array when temperature feature is missing', () => {
+    const results = createThermostat(makeDevice({ features: [] }), ctx);
+    assert.deepEqual(results, []);
   });
 
   it('updateAttribute should not throw for tracked features', () => {
@@ -88,16 +91,17 @@ describe('thermostat', () => {
         makeFeature({ id: 35, featureTypeCategory: 'fan_mode', eventTypeName: 'FanMode', value: 0 }),
       ],
     });
-    const result = assertResult(createThermostat(device, ctx));
+    const results = assertResults(createThermostat(device, ctx), 2);
 
     suppressLogs(() => {
-      assert.doesNotThrow(() => result.updateAttribute(30, 75));
-      assert.doesNotThrow(() => result.updateAttribute(31, 2));
-      assert.doesNotThrow(() => result.updateAttribute(32, 70));
-      assert.doesNotThrow(() => result.updateAttribute(33, 78));
-      assert.doesNotThrow(() => result.updateAttribute(34, 50));
-      assert.doesNotThrow(() => result.updateAttribute(35, 1));
-      assert.doesNotThrow(() => result.updateAttribute(999, 0));
+      assert.doesNotThrow(() => results[0].updateAttribute(30, 75));
+      assert.doesNotThrow(() => results[0].updateAttribute(31, 2));
+      assert.doesNotThrow(() => results[0].updateAttribute(32, 70));
+      assert.doesNotThrow(() => results[0].updateAttribute(33, 78));
+      assert.doesNotThrow(() => results[0].updateAttribute(34, 50));
+      assert.doesNotThrow(() => results[0].updateAttribute(999, 0));
+      assert.doesNotThrow(() => results[1].updateAttribute(35, 1));
+      assert.doesNotThrow(() => results[1].updateAttribute(999, 0));
     });
   });
 });
