@@ -87,13 +87,6 @@ export class IotasPlatform extends MatterbridgeDynamicPlatform {
   override async onConfigure(): Promise<void> {
     await super.onConfigure();
     this.log.info('Configuring IOTAS platform');
-
-    try {
-      const rooms = await this.iotasClient.getRooms();
-      this.refreshStates(rooms);
-    } catch (error) {
-      this.log.warn('Failed to refresh device states on configure:', error);
-    }
   }
 
   override async onShutdown(reason?: string): Promise<void> {
@@ -139,27 +132,6 @@ export class IotasPlatform extends MatterbridgeDynamicPlatform {
         });
 
         this.log.info(`Registered device: ${device.name} (${device.category})`);
-      }
-    }
-  }
-
-  private refreshStates(rooms: Rooms): void {
-    for (const room of rooms) {
-      for (const device of room.devices) {
-        if (!device.paired) {
-          continue;
-        }
-
-        const entry = this.deviceMap.get(device.id);
-        if (!entry) {
-          continue;
-        }
-
-        for (const feature of device.features) {
-          if (feature.value !== undefined) {
-            entry.updateAttribute(feature.id, feature.value);
-          }
-        }
       }
     }
   }
