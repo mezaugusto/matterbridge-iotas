@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.2.3](https://github.com/mezaugusto/matterbridge-iotas/compare/v1.2.2...v1.2.3) (2026-04-15)
+
+
+### Bug Fixes
+
+* :bricks: move humidty sensor to top-level endpoint ([#26](https://github.com/mezaugusto/matterbridge-iotas/issues/26)) ([4a02681](https://github.com/mezaugusto/matterbridge-iotas/commit/4a026815ccc471ad2585b6e2fa427355ccda2b47))
+
 ## [1.2.2](https://github.com/mezaugusto/matterbridge-iotas/compare/v1.2.1...v1.2.2) (2026-04-13)
 
 
