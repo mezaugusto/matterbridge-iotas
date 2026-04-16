@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.2.4](https://github.com/mezaugusto/matterbridge-iotas/compare/v1.2.3...v1.2.4) (2026-04-16)
+
+
+### Bug Fixes
+
+* :bug: fix humidity sensor value outside range ([#28](https://github.com/mezaugusto/matterbridge-iotas/issues/28)) ([f086949](https://github.com/mezaugusto/matterbridge-iotas/commit/f0869490b3777dd1781a36bfb608f7c034e52534))
+
 ## [1.2.3](https://github.com/mezaugusto/matterbridge-iotas/compare/v1.2.2...v1.2.3) (2026-04-15)
 
 
