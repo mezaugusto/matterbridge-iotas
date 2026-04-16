@@ -68,7 +68,9 @@ export function fromMatterLevel(matterLevel: number): number {
 }
 
 export function toMatterHumidity(iotasHumidity: number): number {
-  return Math.round(iotasHumidity * 10000);
+  // Matter uses 0.01% units (0-10000 range for 0-100%)
+  // IOTAS humidity is already a percentage (e.g., 43 for 43%)
+  return Math.round(iotasHumidity * 100);
 }
 
 export function toCelsius(fahrenheit: number): number {
